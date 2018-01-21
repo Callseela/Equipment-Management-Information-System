@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Equipment Management Information System</title>
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div class="top"><p>Equipment Management Information System</p></div>
+<div class="content">
+<ul><li class="show" onclick="show(this)">Search</li><li class="original" onclick="show(this)">Modify</li><li class="original"  onclick="show(this)">Add</li></ul>
+<div class="mainShow" id="Search">
+<label>Enter the:&nbsp </label>
+<select id="property">
+<option value="number">Number</option>
+<option value="name">Name</option>
+<option value="lastCalibrationDate" select="selected">Last calibration date</option>
+<option value="nextCalibrationDate">Next calibration date</option>
+<option value="calibrationInterval">Calibration interval</option>
+</select><input type="text" id="keyword"/><button type="button"  onclick="result(this)">Search</button><br/>
+</div><div class="mainHide" id="Modify">
+<label>Enter the:&nbsp </label>
+<select id="property">
+<option value="number">Number</option>
+<option value="name">Name</option>
+<option value="lastCalibrationDate" select="selected">Last calibration date</option>
+<option value="nextCalibrationDate">Next calibration date</option>
+<option value="calibrationInterval">Calibration interval</option>
+</select><input type="text" id="keyword"/><button type="button"   onclick="modify(this)">Search</button><br/>
+</div><div class="mainHide" id="Add">
+<label>Number:</label>
+<input type="text" id="number"/><br/>
+<label>Name:&nbsp&nbsp&nbsp&nbsp</label>
+<input type="text" id="name"/><br/>
+<label>Last calibration date:&nbsp</label>
+<input type="text" id="lastCalibrationDate"/><br/>
+<label>Next calibration date:</label>
+<input type="text" id="nextCalibrationDate"/><br/>
+<label>Calibration interval:&nbsp&nbsp&nbsp</label>
+<input type="text" id="calibrationInterval"/>
+<button type="button" id="addB" onclick="add(this)">Add</button><button type="button" onclick="delet(this)">Delete</button><br/></div></div>
+<div class="bottom"></div>
+<script>
+function show(a){
+	a.className="show";
+	if(a.parentNode.lastChild===a)
+	{var b=document.getElementById("Add");
+	b.className="mainShow";
+	b.previousSibling.className="mainHide";
+	b.previousSibling.previousSibling.className="mainHide";
+	a.previousSibling.className="original";
+	a.previousSibling.previousSibling.className="original";
+	}
+	else if(a.parentNode.firstChild===a)
+	{ var b=document.getElementById("Search");
+	b.className="mainShow";
+	b.nextSibling.className="mainHide";
+	b.nextSibling.nextSibling.className="mainHide";
+	a.nextSibling.className="original";
+	a.nextSibling.nextSibling.className="original";}
+	else{
+	var b=document.getElementById("Modify");
+	b.className="mainShow";
+	b.previousSibling.className="mainHide";
+	b.nextSibling.className="mainHide";
+	a.previousSibling.className="original";
+	a.nextSibling.className="original";
+	}
+}
+function result(p){  
+    var a=p.parentNode;
+	a.removeChild(a.lastChild);
+    var location="Information_base.php?"+p.previousSibling.previousSibling.value+"="+p.previousSibling.value;
+	var request = new XMLHttpRequest();
+	request.open("GET", location);
+	request.send();
+	request.onreadystatechange = function() {
+		if (request.readyState===4) {
+			if (request.status===200) { 
+				var data = JSON.parse(request.responseText);
+				if (data.success) { 
+				var table=document.createElement("table");
+				table.innerHTML="<tr><th>Number</th><th>Name</th><th>Last calibration date</th><th>Next calibration date</th><th>Calibration interval</th></tr>";
+				a.appendChild(table);
+				for(var i=0;i<data.msg.length;i++)
+				{
+					var r=document.createElement("tr");
+					var d=document.createElement("td");
+					d.innerHTML=data.msg[i].number;
+					r.appendChild(d);
+					var d=document.createElement("td");
+					d.innerHTML=data.msg[i].name;
+					r.appendChild(d);
+					var d=document.createElement("td");
+					d.innerHTML=data.msg[i].lastCalibrationDate;
+					r.appendChild(d);
+					var d=document.createElement("td");
+					d.innerHTML=data.msg[i].nextCalibrationDate;
+					r.appendChild(d);
+					var d=document.createElement("td");
+					d.innerHTML=data.msg[i].calibrationInterval;
+					r.appendChild(d);
+					table.appendChild(r);
+					r.onclick=function(){
+						var trs = table.getElementsByTagName("tr");
+						for (var i = 0; i < trs.length; i++) {
+							trs[i].onclick = function(){
+								for (var i = 0; i < trs.length; i++) {
+									if (trs[i] == this) { //判断是不是当前选择的行
+									trs[i].style.background = "#b2d0ff";}
+									else {trs[i].style.background = "white";}}
+									}
+									}
+									}
+									
+					}	
+				} else {
+					var alt=document.createElement("p");
+					alt.innerHTML=data.msg;
+					a.appendChild(alt);
+				}
+			} else {
+				var alt=document.createElement("p");
+					alt.innerHTML="Error：" + request.status;
+					a.appendChild(alt);
+			}
+		  } 
+	}
+}
+
+function modify(p){  
+    var a=p.parentNode;
+	a.removeChild(a.lastChild);
+    var location="Information_base.php?"+p.previousSibling.previousSibling.value+"="+p.previousSibling.value;
+	var request = new XMLHttpRequest();
+	request.open("GET", location);
+	request.send();
+	request.onreadystatechange = function() {
+		if (request.readyState===4) {
+			if (request.status===200) { 
+				var data = JSON.parse(request.responseText);
+				if (data.success) { 
+				var table=document.createElement("table");
+				table.innerHTML="<tr id='head'><th>Number</th><th>Name</th><th>Last calibration date</th><th>Next calibration date</th><th>Calibration interval</th></tr>";
+				table.id="T";
+				a.appendChild(table);
+				for(var i=0;i<data.msg.length;i++)
+				{
+					var r=document.createElement("tr");
+					var d=document.createElement("td");
+					d.innerHTML=data.msg[i].number;
+					r.appendChild(d);
+					var d=document.createElement("td");
+					d.innerHTML=data.msg[i].name;
+					r.appendChild(d);
+					var d=document.createElement("td");
+					d.innerHTML=data.msg[i].lastCalibrationDate;
+					r.appendChild(d);
+					var d=document.createElement("td");
+					d.innerHTML=data.msg[i].nextCalibrationDate;
+					r.appendChild(d);
+					var d=document.createElement("td");
+					d.innerHTML=data.msg[i].calibrationInterval;
+					r.appendChild(d);
+					table.appendChild(r);}
+						var trs = document.getElementById("T").getElementsByTagName("tr");
+						for (var i = 1; i < trs.length; i++) {
+							trs[i].onclick = function(){
+								for (var i = 0; i < trs.length; i++) {
+									if (trs[i] == this) { //判断是不是当前选择的行
+									trs[i].style.background = "#b2d0ff";}
+									else {trs[i].style.background = "white";}}
+									}
+							trs[i].ondblclick= function(){
+								var tab=document.getElementById("T").parentNode;
+								var newD=document.createElement("div");
+								newD.style="width:400px;height:400px";
+								newD.id="newdiv";
+								tab.appendChild(newD);
+								for (var i = 1; i < trs.length; i++) {
+									if (trs[i] == this){
+										var	l=document.createElement("p");
+										l.style="font-size:20px;line-height:3em; display:inline";
+									l.innerHTML=document.getElementById("head").childNodes[0].innerHTML+":";
+									newD.appendChild(l);
+									var p=document.createElement("p");
+									p.innerHTML=this.childNodes[0].innerHTML;
+									p.style="font-size:20px;line-height:3em; display:inline";
+									p.id=0;
+									newD.appendChild(p);
+										for(var j=1; j<this.childNodes.length;j++){
+									var	l=document.createElement("label");
+									l.innerHTML=document.getElementById("head").childNodes[j].innerHTML+":";
+									var a=document.createElement("input");
+									a.type="text";
+									a.style="width:120px;text-align:center";
+									a.value=this.childNodes[j].innerHTML;
+									a.id=j;
+									var c=document.createElement("br");
+									newD.appendChild(c);
+									newD.appendChild(l);
+									newD.appendChild(a);
+									}	
+									var b=document.createElement("button");
+									b.innerHTML="Modify";
+									b.type="text";
+									b.onclick=function(){save();}
+									newD.appendChild(b);
+									var c=document.createElement("br");
+									newD.appendChild(c);}								
+								}tab.removeChild(document.getElementById("T"));
+							}
+									
+									}	
+				} else {
+					var alt=document.createElement("p");
+					alt.innerHTML=data.msg;
+					a.appendChild(alt);
+				}
+			} else {
+				var alt=document.createElement("p");
+					alt.innerHTML="Error：" + request.status;
+					a.appendChild(alt);
+			}
+		  } 
+	}
+}
+
+function add(p) { 
+ var a=p.parentNode;
+	a.removeChild(a.lastChild);
+	var data = "number=" + document.getElementById("number").value 
+	         + "&name=" + document.getElementById("name").value 
+	         + "&lastCalibrationDate=" + document.getElementById("lastCalibrationDate").value 
+	         + "&nextCalibrationDate=" + document.getElementById("nextCalibrationDate").value
+			 + "&calibrationInterval=" + document.getElementById("calibrationInterval").value;
+			 document.getElementById("number").value ="";
+			 document.getElementById("name").value ="";
+			 document.getElementById("lastCalibrationDate").value ="";
+			 document.getElementById("nextCalibrationDate").value="";
+			 document.getElementById("calibrationInterval").value="";
+	var request = new XMLHttpRequest();
+	request.open("POST", "Information_base.php");
+	request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	request.send(data);
+	request.onreadystatechange = function() {
+		if (request.readyState===4) {
+			if (request.status===200) { 
+				var data = JSON.parse(request.responseText); 
+                var m=document.createElement("p");
+				if (data.success) { 	
+					m.innerHTML=data.msg;
+					a.appendChild(m);
+				} else {
+					m.innerHTML ="Error:"+ data.msg;
+					a.appendChild(m);
+				}
+			} else {var alt=document.createElement("p");
+					alt.innerHTML="Error：" + request.status;
+					a.appendChild(alt);
+			}
+		} 
+	}
+}
+function delet(p){
+	var a=p.parentNode;
+	a.removeChild(a.lastChild);
+	var data = "number=" + document.getElementById("number").value
+	         + "&name=" + document.getElementById("name").value 
+	         + "&lastCalibrationDate=" + document.getElementById("lastCalibrationDate").value 
+	         + "&nextCalibrationDate=" + document.getElementById("nextCalibrationDate").value
+			 + "&calibrationInterval=" + document.getElementById("calibrationInterval").value
+			 +"&n=q";
+	 document.getElementById("number").value ="";
+			 document.getElementById("name").value ="";
+			 document.getElementById("lastCalibrationDate").value ="";
+			 document.getElementById("nextCalibrationDate").value="";
+			 document.getElementById("calibrationInterval").value="";
+	var request = new XMLHttpRequest();
+	request.open("POST", "Information_base.php");
+	request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	request.send(data);
+	request.onreadystatechange = function() {
+		if (request.readyState===4) {
+			if (request.status===200) { 
+				var data = JSON.parse(request.responseText); 
+				var m=document.createElement("p");
+				if (data.success) { 	
+					m.innerHTML=data.msg;
+					a.appendChild(m);
+				} else {
+					var m=document.createElement("p");
+					m.innerHTML = "Error:"+ data.msg;
+					a.appendChild(m);
+				}
+			} else {var alt=document.createElement("p");
+					alt.innerHTML="Error：" + request.status;
+					a.appendChild(alt);
+			}
+		} 
+	}
+}
+function save(data){
+	var d=document.getElementById("newdiv");
+	d.removeChild(d.lastChild);
+	var data= "number=" + document.getElementById("0").innerHTML
+	         + "&name=" + document.getElementById("1").value 
+	         + "&lastCalibrationDate=" + document.getElementById("2").value 
+	         + "&nextCalibrationDate=" + document.getElementById("3").value
+			 + "&calibrationInterval=" + document.getElementById("4").value
+			 +"&n=m";
+    var request = new XMLHttpRequest();
+	request.open("POST", "Information_base.php");
+	request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	request.send(data);
+	request.onreadystatechange = function() {
+		if (request.readyState===4) {
+			if (request.status===200) { 
+				var data = JSON.parse(request.responseText); 
+                var m=document.createElement("p");
+				if (data.success) { 	
+					m.innerHTML=data.msg;
+					d.appendChild(m);
+				} else {
+					m.innerHTML ="Error:"+ data.msg;
+					d.appendChild(m);
+				}
+			} else {var alt=document.createElement("p");
+					alt.innerHTML="Error：" + request.status;
+					d.appendChild(alt);
+			}
+		} 
+	}
+	}
+
+</script>
+</body>
+</html>
